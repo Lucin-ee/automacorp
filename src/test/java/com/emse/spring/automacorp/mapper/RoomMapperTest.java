@@ -21,7 +21,8 @@ class RoomMapperTest {
         RoomEntity roomEntity = FakeEntityBuilder.createRoomEntity(11L, "Room1Building");
 
         // Act
-        RoomRecord room = RoomMapper.of(roomEntity);
+        RoomMapper mapper = new RoomMapper();
+        RoomRecord room = mapper.toRecord(roomEntity);
 
         // Assert
         RoomRecord expectedRoom = new RoomRecord(

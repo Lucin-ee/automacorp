@@ -1,6 +1,9 @@
 package com.emse.spring.automacorp.api;
 
 import com.emse.spring.automacorp.command.WindowCommand;
+import com.emse.spring.automacorp.dao.RoomDao;
+import com.emse.spring.automacorp.dao.WindowDao;
+import com.emse.spring.automacorp.model.RoomEntity;
 import com.emse.spring.automacorp.model.WindowEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,32 +15,36 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/windows")
 public class WindowController {
-    private List<WindowEntity> windowStorage = new ArrayList<>();
+
+    private final WindowDao windowDao;
+    private final RoomDao roomDao;
+
+    public WindowController(WindowDao windowDao, RoomDao roomDao) {
+        this.windowDao = windowDao;
+        this.roomDao = roomDao;
+    }
+
 
     @PostMapping
     public ResponseEntity<WindowEntity> createWindow(@RequestBody WindowCommand windowCommand) {
+        RoomEntity roomEntity = roomDao.findById(windowCommand.roomId()).orElseThrow(IllegalArgumentException::new);
         WindowEntity newWindow = new WindowEntity();
         newWindow.setName(windowCommand.name());
         newWindow.setWindowStatus(windowCommand.windowStatus());
-        newWindow.setRoomId(windowCommand.roomId());
-        windowStorage.add(newWindow);
+        newWindow.setRoom(roomEntity);
+        windowDao.save(newWindow);
         return ResponseEntity.ok(newWindow);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<WindowEntity> updateWindow(@PathVariable Long id, @RequestBody WindowCommand windowCommand) {
-        Optional<WindowEntity> windowOpt = windowStorage.stream()
-                .filter(w -> w.getId().equals(id))
-                .findFirst();
-        if (windowOpt.isPresent()) {
-            WindowEntity window = windowOpt.get();
-            window.setName(windowCommand.name());
-            window.setWindowStatus(windowCommand.windowStatus());
-            window.setRoomId(windowCommand.roomId());
-            return ResponseEntity.ok(window);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        RoomEntity roomEntity = roomDao.findById(windowCommand.roomId()).orElseThrow(IllegalArgumentException::new);
+        WindowEntity windowEntity = windowDao.findById(id).orElseThrow(IllegalArgumentException::new);
+
+        windowEntity.setName(windowCommand.name());
+        windowEntity.setWindowStatus(windowCommand.windowStatus());
+        windowEntity.setRoom(roomEntity);
+            return ResponseEntity.ok(windowEntity);
     }
 }
 

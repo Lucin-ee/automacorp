@@ -12,7 +12,7 @@ public class WindowEntity {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
+    @Enumerated(EnumType.STRING)
     private WindowStatus windowStatus;
 
     @ManyToOne

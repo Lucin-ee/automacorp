@@ -20,7 +20,7 @@ public class BuildingEntity {
     private int numberOfFloors;
 
     // One building can have many rooms
-    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<RoomEntity> rooms;
 
     // Default constructor (required by JPA)

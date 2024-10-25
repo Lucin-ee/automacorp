@@ -8,23 +8,35 @@ import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 public class RoomMapper {
+
     public RoomDto toDto(RoomEntity entity) {
         return new RoomDto(
                 entity.getId(),
-                entity.getName(),
                 entity.getFloor(),
+                entity.getName(),
                 entity.getTargetTemperature(),
-                entity.getWindows().stream().map(WindowMapper::toDto).collect(Collectors.toList())
+                entity.getCurrentTemperature().getId()
         );
     }
 
-    public RoomEntity toEntity(RoomDto dto) {
+    public RoomRecord toRecord(RoomEntity dto) {
+
+        return new RoomRecord(
+                dto.getId(),
+                dto.getFloor(),
+                dto.getName(),
+                dto.getTargetTemperature(),
+                dto.getCurrentTemperature().getId()
+        );
+    }
+
+    public RoomEntity toEntity(RoomDto dto, SensorEntity cuurent) {
         RoomEntity room = new RoomEntity();
-        room.setId(dto.id());
-        room.setName(dto.name());
-        room.setFloor(dto.floor());
-        room.setTargetTemperature(dto.targetTemperature());
-        // Skipping windows as they require a bidirectional relationship setup
+        room.setId(dto.getId());
+        room.setFloor(dto.getFloor());
+        room.setName(dto.getName());
+        room.setTargetTemperature(dto.getTargetTemperature());
+        room.setCurrentTemperature(cuurent);
         return room;
     }
 }
